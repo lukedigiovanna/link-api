@@ -13,6 +13,7 @@ class UsersRouter implements RouteSource {
 
     public initializeRoutes() {
         this.router.get("/", this.controller.allUsers);
+        this.router.post("/", this.controller.createUser);
     }
 }
 

@@ -1,19 +1,11 @@
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
+import './config';
+import App from './app';
+import UsersRouter from './routes/users';
+import PostsRouter from './routes/posts';
 
-async function main() {
-    const posts = await prisma.posts.findMany({
-        where: {
-            Users: {
-                id: "1"
-            }
-        },
-        select: {
-            Users: true
-        }
-    });
+export const app = new App([
+    new UsersRouter(),
+    new PostsRouter()
+]);
 
-    console.log(posts);
-}
-
-main();
+app.listen();
