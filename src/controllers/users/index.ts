@@ -35,8 +35,8 @@ class UserController {
     public async getUser(req: Request, res: Response, next: NextFunction) {
         try {
             // handle request to get a user by ID
-            const userId = req.params.userId;
-            const user = await usersService.core.getUser(userId);
+            const username = req.params.username;
+            const user = await usersService.core.getUser(username);
             return res.send(user);
         }
         catch (error) {

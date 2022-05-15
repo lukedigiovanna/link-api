@@ -14,6 +14,8 @@ class PostsRouter implements RouteSource {
     public initializeRoutes() {
         this.router.get("/", this.controller.allPosts);
         this.router.post("/", this.controller.createPost);
+        this.router.delete("/:post_id", this.controller.deletePost);
+        this.router.get("/:username", this.controller.getUserPosts);
     }
 }
 

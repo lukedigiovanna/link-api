@@ -1,10 +1,19 @@
 
 users:
-GET /user - returns all user IDs
-POST /user - create a user 
-GET /user/:id - returns the information of a user.
+done GET /user - returns all user IDs + usernames
+done POST /user - create a user 
+done GET /user/:username - returns the information of a user given their username.
 
 posts:
 GET /posts - return all posts
-POST /posts - create a post
-GET /posts/:userId - get the posts of a user 
+POST /posts - create a post, if the post is marked as a reply it will be put in the replies table.
+DELETE /posts/:post_id - delete a particular post
+GET /posts/:username - get the posts of a user 
+
+reactions:
+GET /reactions - return all reactions
+GET /reactions/:post_id - return all reactions of a post
+POST /reactions/:post_id - create a reaction
+
+replies:
+GET /replies/:post_id - return all replies of a post/reply 

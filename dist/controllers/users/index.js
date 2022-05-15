@@ -93,13 +93,13 @@ var UserController = /** @class */ (function () {
     };
     UserController.prototype.getUser = function (req, res, next) {
         return __awaiter(this, void 0, void 0, function () {
-            var userId, user, error_3;
+            var username, user, error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        userId = req.params.userId;
-                        return [4 /*yield*/, users_1.default.core.getUser(userId)];
+                        username = req.params.username;
+                        return [4 /*yield*/, users_1.default.core.getUser(username)];
                     case 1:
                         user = _a.sent();
                         return [2 /*return*/, res.send(user)];

@@ -82,6 +82,46 @@ var PostController = /** @class */ (function () {
             });
         });
     };
+    PostController.prototype.deletePost = function (req, res, next) {
+        return __awaiter(this, void 0, void 0, function () {
+            var postId, error_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        postId = Number(req.params.post_id);
+                        return [4 /*yield*/, posts_1.default.core.deletePost(postId)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, res.sendStatus(200)];
+                    case 2:
+                        error_3 = _a.sent();
+                        return [2 /*return*/, next(error_3)];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    PostController.prototype.getUserPosts = function (req, res, next) {
+        return __awaiter(this, void 0, void 0, function () {
+            var username, posts, error_4;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        username = req.params.username;
+                        return [4 /*yield*/, posts_1.default.core.getUserPosts(username)];
+                    case 1:
+                        posts = _a.sent();
+                        return [2 /*return*/, res.send(posts)];
+                    case 2:
+                        error_4 = _a.sent();
+                        return [2 /*return*/, next(error_4)];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
     return PostController;
 }());
 exports.default = PostController;

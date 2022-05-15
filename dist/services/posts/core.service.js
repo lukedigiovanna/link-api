@@ -76,6 +76,43 @@ var CorePostService = /** @class */ (function () {
             });
         });
     };
+    CorePostService.prototype.deletePost = function (postId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var post;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.post.delete({
+                            where: {
+                                id: postId
+                            }
+                        })];
+                    case 1:
+                        post = _a.sent();
+                        return [2 /*return*/, post.id];
+                }
+            });
+        });
+    };
+    CorePostService.prototype.getUserPosts = function (username) {
+        return __awaiter(this, void 0, void 0, function () {
+            var posts;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.post.findMany({
+                            where: {
+                                User: {
+                                    username: username
+                                },
+                                is_reply: false // don't include replies, we only want original posts.
+                            }
+                        })];
+                    case 1:
+                        posts = _a.sent();
+                        return [2 /*return*/, posts];
+                }
+            });
+        });
+    };
     return CorePostService;
 }());
 exports.default = new CorePostService();

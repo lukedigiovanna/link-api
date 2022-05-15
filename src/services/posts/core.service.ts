@@ -28,6 +28,29 @@ class CorePostService {
 
         return newPost.id;
     }
+
+    async deletePost(postId: number): Promise<number> {
+        const post = await this.prisma.post.delete({
+            where: {
+                id: postId
+            }
+        });
+
+        return post.id;
+    }
+
+    async getUserPosts(username: string): Promise<Post[]> {
+        const posts = await this.prisma.post.findMany({
+            where: {
+                User: {
+                    username: username
+                },
+                is_reply: false // don't include replies, we only want original posts.
+            }
+        });
+
+        return posts;
+    }
 }
 
 export default new CorePostService();

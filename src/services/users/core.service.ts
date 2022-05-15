@@ -63,7 +63,19 @@ class CoreUserService {
         return newUser.id;
     }
 
-    async getUser(userId: string): Promise<UserData> {
+    async getUser(username: string): Promise<UserData> {
+        // get the user id of the username
+        const user = await this.prisma.user.findFirst({
+            where: {
+                username: username
+            }
+        });
+        
+        if (!user) { 
+            throw new ErrorException(ErrorCode.NotFound, {"message": `User ${username} does not exist`});
+        }
+        
+        const userId = user.id;
         const userDoc = this.firestore.collection("users").doc(userId);
         const info = await userDoc.get();
         const infoData = info.data();
@@ -72,11 +84,17 @@ class CoreUserService {
             throw new ErrorException(ErrorCode.NotFound, {"message": `User ${userId} not found`});
         }
 
-        console.log(infoData);
+        console.log("Info Data", infoData);
 
         // convert firestore data to user data
-        infoData.created_at = infoData.created_at.toDate();
-
+        if (infoData.createdAt) {
+            infoData.createdAt = infoData.createdAt.toDate();
+        }
+        else {
+            const newDate = new Date();
+            userDoc.update({ createdAt: newDate });
+            infoData.createdAt = new Date();
+        }
 
         return {...infoData};
     }

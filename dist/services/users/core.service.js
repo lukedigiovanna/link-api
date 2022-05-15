@@ -117,23 +117,40 @@ var CoreUserService = /** @class */ (function () {
             });
         });
     };
-    CoreUserService.prototype.getUser = function (userId) {
+    CoreUserService.prototype.getUser = function (username) {
         return __awaiter(this, void 0, void 0, function () {
-            var userDoc, info, infoData;
+            var user, userId, userDoc, info, infoData, newDate;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
+                    case 0: return [4 /*yield*/, this.prisma.user.findFirst({
+                            where: {
+                                username: username
+                            }
+                        })];
+                    case 1:
+                        user = _a.sent();
+                        if (!user) {
+                            throw new error_type_1.ErrorException(error_type_1.ErrorCode.NotFound, { "message": "User ".concat(username, " does not exist") });
+                        }
+                        userId = user.id;
                         userDoc = this.firestore.collection("users").doc(userId);
                         return [4 /*yield*/, userDoc.get()];
-                    case 1:
+                    case 2:
                         info = _a.sent();
                         infoData = info.data();
                         if (!infoData) { // will not receive this data if there is no user associated with the ID
                             throw new error_type_1.ErrorException(error_type_1.ErrorCode.NotFound, { "message": "User ".concat(userId, " not found") });
                         }
-                        console.log(infoData);
+                        console.log("Info Data", infoData);
                         // convert firestore data to user data
-                        infoData.created_at = infoData.created_at.toDate();
+                        if (infoData.createdAt) {
+                            infoData.createdAt = infoData.createdAt.toDate();
+                        }
+                        else {
+                            newDate = new Date();
+                            userDoc.update({ createdAt: newDate });
+                            infoData.createdAt = new Date();
+                        }
                         return [2 /*return*/, __assign({}, infoData)];
                 }
             });
