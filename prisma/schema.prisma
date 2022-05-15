@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Posts {
+  id         Int         @id
+  user_id    String?
+  body       String?
+  created_at DateTime?   @db.Timestamp(6)
+  is_reply   Boolean?
+  Users      Users?      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Reactions  Reactions[]
+  Replies    Replies[]
+  @@map("posts")
+}
+
+model Reactions {
+  id       Int      @id
+  post_id  Int?
+  user_id  String?
+  reaction Emotion?
+  Posts    Posts?   @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Users    Users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  @@map("reactions")
+}
+
+model Replies {
+  id      Int    @id
+  post_id Int?
+  Posts   Posts? @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  @@map("replies")
+}
+
+model Users {
+  id        String      @id
+  Posts     Posts[]
+  Reactions Reactions[]
+  @@map("users")
+}
+
+enum Emotion {
+  like
+  dislike
+  love
+  haha
+  wow
+  sad
+  angry
+  @@map("emotion")
+}
