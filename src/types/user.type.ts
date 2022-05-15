@@ -5,5 +5,8 @@ export interface CreateUserPayload {
     firstName: string;
     lastName: string;
     avatarURL: string;
-    createdAt: Date;
+}
+
+export interface UserData {
+    
 }

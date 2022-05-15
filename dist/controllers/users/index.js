@@ -65,18 +65,47 @@ var UserController = /** @class */ (function () {
     };
     UserController.prototype.createUser = function (req, res, next) {
         return __awaiter(this, void 0, void 0, function () {
-            var user, error_2;
+            var userData, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, users_1.default.core.createUser(req.body)];
+                        // handle request to create a new user
+                        console.log(req.body);
+                        userData = req.body;
+                        // if using zod, we could ensure that the given userData follows the correct schema
+                        // CreateUserPayload.parse(userData); 
+                        // UserPayloadSchema.parse(...)
+                        return [4 /*yield*/, users_1.default.core.createUser(userData)];
+                    case 1:
+                        // if using zod, we could ensure that the given userData follows the correct schema
+                        // CreateUserPayload.parse(userData); 
+                        // UserPayloadSchema.parse(...)
+                        _a.sent();
+                        return [2 /*return*/, res.send({ "message": "User created successfully" })]; // send the UID as proof of new user.
+                    case 2:
+                        error_2 = _a.sent();
+                        return [2 /*return*/, next(error_2)];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    UserController.prototype.getUser = function (req, res, next) {
+        return __awaiter(this, void 0, void 0, function () {
+            var userId, user, error_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        userId = req.params.userId;
+                        return [4 /*yield*/, users_1.default.core.getUser(userId)];
                     case 1:
                         user = _a.sent();
                         return [2 /*return*/, res.send(user)];
                     case 2:
-                        error_2 = _a.sent();
-                        return [2 /*return*/, next(error_2)];
+                        error_3 = _a.sent();
+                        return [2 /*return*/, next(error_3)];
                     case 3: return [2 /*return*/];
                 }
             });

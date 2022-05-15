@@ -1,0 +1,10 @@
+
+users:
+GET /user - returns all user IDs
+POST /user - create a user 
+GET /user/:id - returns the information of a user.
+
+posts:
+GET /posts - return all posts
+POST /posts - create a post
+GET /posts/:userId - get the posts of a user 

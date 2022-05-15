@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -39,6 +50,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var client_1 = require("@prisma/client");
 var firestore_1 = require("firebase-admin/firestore");
 var auth_1 = require("firebase-admin/auth");
+var error_type_1 = require("../../types/error.type");
 var CoreUserService = /** @class */ (function () {
     function CoreUserService() {
         this.prisma = new client_1.PrismaClient();
@@ -50,7 +62,7 @@ var CoreUserService = /** @class */ (function () {
             var users;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.prisma.users.findMany({
+                    case 0: return [4 /*yield*/, this.prisma.user.findMany({
                         // all
                         })];
                     case 1:
@@ -62,15 +74,25 @@ var CoreUserService = /** @class */ (function () {
     };
     CoreUserService.prototype.createUser = function (user) {
         return __awaiter(this, void 0, void 0, function () {
-            var firebaseUser, firestoreUser, newUser;
+            var users, firebaseUser, firestoreUser, newUser;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.auth.createUser({
-                            email: user.email,
-                            emailVerified: false,
-                            password: user.password
+                    case 0: return [4 /*yield*/, this.prisma.user.findFirst({
+                            where: {
+                                username: user.name
+                            }
                         })];
                     case 1:
+                        users = _a.sent();
+                        if (users) {
+                            throw new error_type_1.ErrorException(error_type_1.ErrorCode.Conflict, { "message": "User ".concat(user.name, " already exists") });
+                        }
+                        return [4 /*yield*/, this.auth.createUser({
+                                email: user.email,
+                                emailVerified: false,
+                                password: user.password
+                            })];
+                    case 2:
                         firebaseUser = _a.sent();
                         return [4 /*yield*/, this.firestore.collection('users').doc(firebaseUser.uid).set({
                                 name: user.name,
@@ -80,16 +102,39 @@ var CoreUserService = /** @class */ (function () {
                                 avatarURL: user.avatarURL,
                                 createdAt: new Date()
                             })];
-                    case 2:
+                    case 3:
                         firestoreUser = _a.sent();
-                        return [4 /*yield*/, this.prisma.users.create({
+                        return [4 /*yield*/, this.prisma.user.create({
                                 data: {
-                                    id: firebaseUser.uid
+                                    id: firebaseUser.uid,
+                                    username: user.name
                                 }
                             })];
-                    case 3:
+                    case 4:
                         newUser = _a.sent();
                         return [2 /*return*/, newUser.id];
+                }
+            });
+        });
+    };
+    CoreUserService.prototype.getUser = function (userId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var userDoc, info, infoData;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        userDoc = this.firestore.collection("users").doc(userId);
+                        return [4 /*yield*/, userDoc.get()];
+                    case 1:
+                        info = _a.sent();
+                        infoData = info.data();
+                        if (!infoData) { // will not receive this data if there is no user associated with the ID
+                            throw new error_type_1.ErrorException(error_type_1.ErrorCode.NotFound, { "message": "User ".concat(userId, " not found") });
+                        }
+                        console.log(infoData);
+                        // convert firestore data to user data
+                        infoData.created_at = infoData.created_at.toDate();
+                        return [2 /*return*/, __assign({}, infoData)];
                 }
             });
         });

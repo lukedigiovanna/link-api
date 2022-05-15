@@ -64,15 +64,21 @@ var PostController = /** @class */ (function () {
     };
     PostController.prototype.createPost = function (req, res, next) {
         return __awaiter(this, void 0, void 0, function () {
+            var payload, error_2;
             return __generator(this, function (_a) {
-                try {
-                    // const post = await postService.core.createPost(req.body);
-                    // return res.send(post);
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        payload = req.body;
+                        return [4 /*yield*/, posts_1.default.core.createPost(payload)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, res.sendStatus(201)];
+                    case 2:
+                        error_2 = _a.sent();
+                        return [2 /*return*/, next(error_2)];
+                    case 3: return [2 /*return*/];
                 }
-                catch (error) {
-                    return [2 /*return*/, next(error)];
-                }
-                return [2 /*return*/];
             });
         });
     };

@@ -13,6 +13,7 @@ class PostsRouter implements RouteSource {
 
     public initializeRoutes() {
         this.router.get("/", this.controller.allPosts);
+        this.router.post("/", this.controller.createPost);
     }
 }
 

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import postService from "../../services/posts";
+import { PostPayload } from "../../types/post.type";
 
 class PostController {
     public async allPosts(req: Request, res: Response, next: NextFunction) {
@@ -14,8 +15,9 @@ class PostController {
 
     public async createPost(req: Request, res: Response, next: NextFunction) {
         try {
-            // const post = await postService.core.createPost(req.body);
-            // return res.send(post);
+            const payload: PostPayload = req.body;
+            await postService.core.createPost(payload);
+            return res.sendStatus(201);
         }
         catch (error) {
             return next(error);

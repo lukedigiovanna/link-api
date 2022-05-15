@@ -14,6 +14,7 @@ var PostsRouter = /** @class */ (function () {
     }
     PostsRouter.prototype.initializeRoutes = function () {
         this.router.get("/", this.controller.allPosts);
+        this.router.post("/", this.controller.createPost);
     };
     return PostsRouter;
 }());

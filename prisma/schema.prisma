@@ -7,39 +7,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Posts {
-  id         Int         @id
+model Post {
+  id         Int        @id @default(autoincrement())
   user_id    String?
   body       String?
-  created_at DateTime?   @db.Timestamp(6)
+  created_at DateTime   @default(now()) @db.Timestamp(6)
   is_reply   Boolean?
-  Users      Users?      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Reactions  Reactions[]
+  User       User?      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Reactions  Reaction[]
   Replies    Replies[]
+
   @@map("posts")
 }
 
-model Reactions {
+model Reaction {
   id       Int      @id
   post_id  Int?
   user_id  String?
   reaction Emotion?
-  Posts    Posts?   @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Users    Users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Posts    Post?    @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Users    User?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   @@map("reactions")
 }
 
 model Replies {
-  id      Int    @id
+  id      Int   @id
   post_id Int?
-  Posts   Posts? @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Posts   Post? @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   @@map("replies")
 }
 
-model Users {
-  id        String      @id
-  Posts     Posts[]
-  Reactions Reactions[]
+model User {
+  id        String     @id
+  username  String?    @unique
+  Posts     Post[]
+  Reactions Reaction[]
+
   @@map("users")
 }
 
@@ -51,5 +56,6 @@ enum Emotion {
   wow
   sad
   angry
+
   @@map("emotion")
 }

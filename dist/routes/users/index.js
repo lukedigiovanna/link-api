@@ -15,6 +15,7 @@ var UsersRouter = /** @class */ (function () {
     UsersRouter.prototype.initializeRoutes = function () {
         this.router.get("/", this.controller.allUsers);
         this.router.post("/", this.controller.createUser);
+        this.router.get("/:userId", this.controller.getUser);
     };
     return UsersRouter;
 }());
