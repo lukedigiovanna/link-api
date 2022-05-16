@@ -27,8 +27,9 @@ class ReactionController {
     public async createReaction(req: Request, res: Response, next: NextFunction) {
         try {
             const reaction = req.body;
+            // need to determine if the given user has already created a reaction on this same post of the same type
             const createdReaction = await reactionsService.core.createReaction(reaction);
-            return res.send(createdReaction);
+            return res.sendStatus(201); // correctly created.
         }
         catch (error) {
             return next(error);
