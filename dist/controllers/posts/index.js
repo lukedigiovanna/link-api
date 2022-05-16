@@ -51,7 +51,7 @@ var PostController = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        getAll = Boolean(req.query.all);
+                        getAll = req.query.all === 'true';
                         return [4 /*yield*/, posts_1.default.core.getAllPosts(getAll)];
                     case 1:
                         posts = _a.sent();

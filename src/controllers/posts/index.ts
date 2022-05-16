@@ -6,7 +6,7 @@ import { PostPayload } from "../../types/post.type";
 class PostController {
     public async allPosts(req: Request, res: Response, next: NextFunction) {
         try {
-            const getAll = Boolean(req.query.all);
+            const getAll = req.query.all === 'true';
             const posts = await postService.core.getAllPosts(getAll);
             return res.send(posts);
         }
