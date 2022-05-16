@@ -10,7 +10,9 @@ class CorePostService {
 
     async getAllPosts(): Promise<Post[]> {
         const posts = await this.prisma.post.findMany({
-            // all
+            where: {
+                is_reply: false // don't include replies, we only want original posts.
+            }
         });
 
         return posts;
@@ -21,12 +23,16 @@ class CorePostService {
             data: {
                 body: post.body,
                 user_id: post.userId,
-                created_at: new Date(),
                 is_reply: post.isReply
             }
         });
 
         return newPost.id;
+    }
+
+    async createReply(post: PostPayload): Promise<number> {
+        const thisPost = await this.createPost(post);
+
     }
 
     async deletePost(postId: number): Promise<number> {

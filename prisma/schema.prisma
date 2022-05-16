@@ -8,33 +8,36 @@ datasource db {
 }
 
 model Post {
-  id         Int        @id @default(autoincrement())
-  user_id    String?
-  body       String?
-  created_at DateTime   @default(now()) @db.Timestamp(6)
-  is_reply   Boolean?
-  User       User?      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Reactions  Reaction[]
-  Replies    Replies[]
+  id                               Int        @id @default(autoincrement())
+  user_id                          String?
+  body                             String?
+  created_at                       DateTime   @default(now()) @db.Timestamp(6)
+  is_reply                         Boolean?
+  User                             User?      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Reactions                        Reaction[]
+  replies_postsToreplies_parent_id Replies[]  @relation("postsToreplies_parent_id")
+  Replies                          Replies[]
 
   @@map("posts")
 }
 
 model Reaction {
-  id       Int      @id
+  id       Int      @id @default(autoincrement())
   post_id  Int?
   user_id  String?
   reaction Emotion?
-  Posts    Post?    @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Users    User?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Post     Post?    @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  User     User?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("reactions")
 }
 
 model Replies {
-  id      Int   @id
-  post_id Int?
-  Posts   Post? @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                             Int   @id
+  post_id                        Int?
+  parent_id                      Int?
+  posts_postsToreplies_parent_id Post? @relation("postsToreplies_parent_id", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Post                           Post? @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("replies")
 }

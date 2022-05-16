@@ -5,9 +5,9 @@ done POST /user - create a user
 done GET /user/:username - returns the information of a user given their username.
 
 posts:
-GET /posts - return all posts
+done GET /posts - return all posts
 POST /posts - create a post, if the post is marked as a reply it will be put in the replies table.
-DELETE /posts/:post_id - delete a particular post
+halfdone DELETE /posts/:post_id - delete a particular post, does not delete replies of said post yet
 GET /posts/:username - get the posts of a user 
 
 reactions:

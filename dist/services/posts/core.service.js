@@ -41,13 +41,19 @@ var CorePostService = /** @class */ (function () {
     function CorePostService() {
         this.prisma = new client_1.PrismaClient();
     }
+    /**
+     * Get all original posts (ones that are not replies)
+     * @returns {Promise<Post[]>} all original posts
+     */
     CorePostService.prototype.getAllPosts = function () {
         return __awaiter(this, void 0, void 0, function () {
             var posts;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.prisma.post.findMany({
-                        // all
+                            where: {
+                                is_reply: false // don't include replies, we only want original posts.
+                            }
                         })];
                     case 1:
                         posts = _a.sent();
@@ -65,7 +71,6 @@ var CorePostService = /** @class */ (function () {
                             data: {
                                 body: post.body,
                                 user_id: post.userId,
-                                created_at: new Date(),
                                 is_reply: post.isReply
                             }
                         })];

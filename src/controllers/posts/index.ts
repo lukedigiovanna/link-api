@@ -16,7 +16,12 @@ class PostController {
     public async createPost(req: Request, res: Response, next: NextFunction) {
         try {
             const payload: PostPayload = req.body;
-            await postService.core.createPost(payload);
+            if (payload.isReply) {
+                await postService.core.createReply(payload);
+            }
+            else {
+                await postService.core.createPost(payload);
+            }
             return res.sendStatus(201);
         }
         catch (error) {

@@ -35,74 +35,69 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var reactions_1 = __importDefault(require("../../services/reactions"));
-var ReactionController = /** @class */ (function () {
-    function ReactionController() {
+var client_1 = require("@prisma/client");
+var CoreReactionService = /** @class */ (function () {
+    function CoreReactionService() {
+        this.prisma = new client_1.PrismaClient();
     }
-    ReactionController.prototype.allReactions = function (req, res, next) {
+    CoreReactionService.prototype.getAllReactions = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var reactions, error_1;
+            var reactions;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        console.log("Reactions");
-                        return [4 /*yield*/, reactions_1.default.core.getAllReactions()];
+                    case 0: return [4 /*yield*/, this.prisma.reaction.findMany({
+                        // all
+                        })];
                     case 1:
                         reactions = _a.sent();
-                        return [2 /*return*/, res.send(reactions)];
-                    case 2:
-                        error_1 = _a.sent();
-                        return [2 /*return*/, next(error_1)];
-                    case 3: return [2 /*return*/];
+                        return [2 /*return*/, reactions];
                 }
             });
         });
     };
-    ReactionController.prototype.getPostReactions = function (req, res, next) {
+    CoreReactionService.prototype.createReaction = function (reaction) {
         return __awaiter(this, void 0, void 0, function () {
-            var postId, reactions, error_2;
+            var createdReaction;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        postId = Number(req.params.post_id);
-                        return [4 /*yield*/, reactions_1.default.core.getPostReactions(postId)];
-                    case 1:
-                        reactions = _a.sent();
-                        return [2 /*return*/, res.send(reactions)];
-                    case 2:
-                        error_2 = _a.sent();
-                        return [2 /*return*/, next(error_2)];
-                    case 3: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    ReactionController.prototype.createReaction = function (req, res, next) {
-        return __awaiter(this, void 0, void 0, function () {
-            var reaction, createdReaction, error_3;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        reaction = req.body;
-                        return [4 /*yield*/, reactions_1.default.core.createReaction(reaction)];
+                        console.log(reaction);
+                        return [4 /*yield*/, this.prisma.reaction.create({
+                                data: {
+                                    Post: {
+                                        connect: { id: reaction.postId }
+                                    },
+                                    User: {
+                                        connect: { id: reaction.userId }
+                                    },
+                                    reaction: reaction.reaction
+                                }
+                            })];
                     case 1:
                         createdReaction = _a.sent();
-                        return [2 /*return*/, res.send(createdReaction)];
-                    case 2:
-                        error_3 = _a.sent();
-                        return [2 /*return*/, next(error_3)];
-                    case 3: return [2 /*return*/];
+                        return [2 /*return*/, createdReaction.id];
                 }
             });
         });
     };
-    return ReactionController;
+    CoreReactionService.prototype.getPostReactions = function (postId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var reactions;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.reaction.findMany({
+                            where: {
+                                post_id: postId
+                            }
+                        })];
+                    case 1:
+                        reactions = _a.sent();
+                        return [2 /*return*/, reactions];
+                }
+            });
+        });
+    };
+    return CoreReactionService;
 }());
-exports.default = ReactionController;
+exports.default = new CoreReactionService();
