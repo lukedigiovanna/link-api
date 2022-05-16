@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -117,6 +106,26 @@ var CoreUserService = /** @class */ (function () {
             });
         });
     };
+    CoreUserService.prototype.validateUser = function (userId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var user;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.prisma.user.findFirst({
+                            where: {
+                                id: userId
+                            }
+                        })];
+                    case 1:
+                        user = _a.sent();
+                        if (!user) {
+                            throw new error_type_1.ErrorException(error_type_1.ErrorCode.NotFound, { "message": "User ".concat(userId, " does not exist") });
+                        }
+                        return [2 /*return*/, user.id];
+                }
+            });
+        });
+    };
     CoreUserService.prototype.getUser = function (username) {
         return __awaiter(this, void 0, void 0, function () {
             var user, userId, userDoc, info, infoData, newDate;
@@ -151,7 +160,14 @@ var CoreUserService = /** @class */ (function () {
                             userDoc.update({ createdAt: newDate });
                             infoData.createdAt = new Date();
                         }
-                        return [2 /*return*/, __assign({}, infoData)];
+                        return [2 /*return*/, {
+                                name: infoData.name,
+                                email: infoData.email,
+                                firstName: infoData.firstName,
+                                lastName: infoData.lastName,
+                                avatarURL: infoData.avatarURL,
+                                createdAt: infoData.createdAt
+                            }];
                 }
             });
         });

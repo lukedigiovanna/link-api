@@ -1,4 +1,4 @@
 node_modules
 # Keep environment variables out of version control
 .env
-link-b2a31-firebase-adminsdk-n8mr4-cbd450538c.json
+firebase-service-account.json

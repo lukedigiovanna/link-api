@@ -37,24 +37,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var client_1 = require("@prisma/client");
+var error_type_1 = require("../../types/error.type");
 var CorePostService = /** @class */ (function () {
     function CorePostService() {
         this.prisma = new client_1.PrismaClient();
     }
-    /**
-     * Get all original posts (ones that are not replies)
-     * @returns {Promise<Post[]>} all original posts
-     */
-    CorePostService.prototype.getAllPosts = function () {
+    CorePostService.prototype.getAllPosts = function (getAll) {
         return __awaiter(this, void 0, void 0, function () {
             var posts;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.prisma.post.findMany({
-                            where: {
-                                is_reply: false // don't include replies, we only want original posts.
-                            }
-                        })];
+                    case 0:
+                        console.log(getAll);
+                        return [4 /*yield*/, this.prisma.post.findMany({
+                                where: {
+                                    OR: [
+                                        { is_reply: false },
+                                        { is_reply: getAll } // include replies if getAll is true.
+                                    ]
+                                }
+                            })];
                     case 1:
                         posts = _a.sent();
                         return [2 /*return*/, posts];
@@ -77,6 +79,32 @@ var CorePostService = /** @class */ (function () {
                     case 1:
                         newPost = _a.sent();
                         return [2 /*return*/, newPost.id];
+                }
+            });
+        });
+    };
+    CorePostService.prototype.createReply = function (post) {
+        return __awaiter(this, void 0, void 0, function () {
+            var thisPostID, newReply;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!post.parentId) {
+                            throw new error_type_1.ErrorException(error_type_1.ErrorCode.BadRequest, "parentId is required for replies");
+                        }
+                        return [4 /*yield*/, this.createPost(post)];
+                    case 1:
+                        thisPostID = _a.sent();
+                        console.log(thisPostID);
+                        return [4 /*yield*/, this.prisma.replies.create({
+                                data: {
+                                    post_id: thisPostID,
+                                    parent_id: post.parentId
+                                }
+                            })];
+                    case 2:
+                        newReply = _a.sent();
+                        return [2 /*return*/, newReply.id];
                 }
             });
         });

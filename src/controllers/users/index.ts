@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import usersService from '../../services/users';
-import { CreateUserPayload } from "../../types/user.type";
+import { CreateUserPayload, UserData } from "../../types/user.type";
 
 // this is where we will set up logic for when client reaches a particular endpoint related to the users
 
@@ -36,7 +36,7 @@ class UserController {
         try {
             // handle request to get a user by ID
             const username = req.params.username;
-            const user = await usersService.core.getUser(username);
+            const user: UserData = await usersService.core.getUser(username);
             return res.send(user);
         }
         catch (error) {

@@ -1,4 +1,5 @@
 import { PrismaClient, Post } from "@prisma/client";
+import { ErrorCode, ErrorException } from "../../types/error.type";
 import { PostPayload } from "../../types/post.type";
 
 class CorePostService {
@@ -8,10 +9,14 @@ class CorePostService {
         this.prisma = new PrismaClient();
     }
 
-    async getAllPosts(): Promise<Post[]> {
+    async getAllPosts(getAll: boolean): Promise<Post[]> {
+        console.log(getAll);
         const posts = await this.prisma.post.findMany({
             where: {
-                is_reply: false // don't include replies, we only want original posts.
+                OR: [
+                    {is_reply: false}, // don't include replies, we only want original posts.
+                    {is_reply: getAll} // include replies if getAll is true.
+                ]
             }
         });
 
@@ -31,8 +36,22 @@ class CorePostService {
     }
 
     async createReply(post: PostPayload): Promise<number> {
-        const thisPost = await this.createPost(post);
+        if (!post.parentId) {
+            throw new ErrorException(ErrorCode.BadRequest, "parentId is required for replies");
+        }
 
+        const thisPostID = await this.createPost(post);
+
+        console.log(thisPostID);
+        
+        const newReply = await this.prisma.replies.create({
+            data: {
+                post_id: thisPostID,
+                parent_id: post.parentId
+            }
+        });
+
+        return newReply.id;
     }
 
     async deletePost(postId: number): Promise<number> {

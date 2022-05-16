@@ -8,5 +8,10 @@ export interface CreateUserPayload {
 }
 
 export interface UserData {
-    
+    name: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    avatarURL: string;
+    createdAt: Date;
 }

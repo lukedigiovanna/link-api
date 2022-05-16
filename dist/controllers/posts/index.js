@@ -40,17 +40,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var posts_1 = __importDefault(require("../../services/posts"));
+var users_1 = __importDefault(require("../../services/users"));
 var PostController = /** @class */ (function () {
     function PostController() {
     }
     PostController.prototype.allPosts = function (req, res, next) {
         return __awaiter(this, void 0, void 0, function () {
-            var posts, error_1;
+            var getAll, posts, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, posts_1.default.core.getAllPosts()];
+                        getAll = Boolean(req.query.all);
+                        return [4 /*yield*/, posts_1.default.core.getAllPosts(getAll)];
                     case 1:
                         posts = _a.sent();
                         return [2 /*return*/, res.send(posts)];
@@ -64,20 +66,29 @@ var PostController = /** @class */ (function () {
     };
     PostController.prototype.createPost = function (req, res, next) {
         return __awaiter(this, void 0, void 0, function () {
-            var payload, error_2;
+            var payload, userId, error_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
+                        _a.trys.push([0, 5, , 6]);
                         payload = req.body;
-                        return [4 /*yield*/, posts_1.default.core.createPost(payload)];
+                        userId = payload.userId;
+                        users_1.default.core.validateUser(userId);
+                        console.log(payload);
+                        if (!payload.isReply) return [3 /*break*/, 2];
+                        return [4 /*yield*/, posts_1.default.core.createReply(payload)];
                     case 1:
                         _a.sent();
-                        return [2 /*return*/, res.sendStatus(201)];
-                    case 2:
+                        return [3 /*break*/, 4];
+                    case 2: return [4 /*yield*/, posts_1.default.core.createPost(payload)];
+                    case 3:
+                        _a.sent();
+                        _a.label = 4;
+                    case 4: return [2 /*return*/, res.sendStatus(201)];
+                    case 5:
                         error_2 = _a.sent();
                         return [2 /*return*/, next(error_2)];
-                    case 3: return [2 /*return*/];
+                    case 6: return [2 /*return*/];
                 }
             });
         });

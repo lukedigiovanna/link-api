@@ -33,10 +33,10 @@ model Reaction {
 }
 
 model Replies {
-  id                             Int   @id
+  id                             Int   @id @default(autoincrement())
   post_id                        Int?
   parent_id                      Int?
-  posts_postsToreplies_parent_id Post? @relation("postsToreplies_parent_id", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Parent                         Post? @relation("postsToreplies_parent_id", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Post                           Post? @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("replies")

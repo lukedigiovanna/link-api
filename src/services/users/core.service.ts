@@ -63,6 +63,21 @@ class CoreUserService {
         return newUser.id;
     }
 
+    async validateUser(userId: string): Promise<string> {
+        // get the user id of the username
+        const user = await this.prisma.user.findFirst({
+            where: {
+                id: userId
+            }
+        });
+        
+        if (!user) { 
+            throw new ErrorException(ErrorCode.NotFound, {"message": `User ${userId} does not exist`});
+        }
+        
+        return user.id;
+    }
+
     async getUser(username: string): Promise<UserData> {
         // get the user id of the username
         const user = await this.prisma.user.findFirst({
@@ -96,7 +111,14 @@ class CoreUserService {
             infoData.createdAt = new Date();
         }
 
-        return {...infoData};
+        return {
+            name: infoData.name,
+            email: infoData.email,
+            firstName: infoData.firstName,
+            lastName: infoData.lastName,
+            avatarURL: infoData.avatarURL,
+            createdAt: infoData.createdAt 
+        };
     }
 }
 
