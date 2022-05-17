@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import postService from "../../services/posts";
 import userService from '../../services/users';
+import { ErrorCode, ErrorException } from "../../types/error.type";
 import { PostPayload } from "../../types/post.type";
 
 class PostController {
@@ -25,10 +26,20 @@ class PostController {
 
     public async createPost(req: Request, res: Response, next: NextFunction) {
         try {
-            const payload: PostPayload = req.body;
             // validate the existence of the user
-            const userId = payload.userId;
-            userService.core.validateUser(userId);
+            // const userId = payload.userId;
+            // userService.core.doesUserExist(userId);
+            
+            // validate the authorization of the user via the authorization header
+            if (!req.headers.authorization) {
+                throw new ErrorException(ErrorCode.Unauthorized, 'Authorization header is missing.');
+            }
+            const authorization = req.headers.authorization;
+            console.log(authorization);
+            const userId = await userService.core.getUserIdFromAuthorization(authorization);
+            // attach the authorized userId to the post payload.
+            // this way only a request with proper authorization will translate into a post.
+            const payload: PostPayload = {...req.body, userId}; 
 
             if (payload.isReply) {
                 await postService.core.createReply(payload);

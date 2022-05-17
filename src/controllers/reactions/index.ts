@@ -1,6 +1,8 @@
 import {Request, Response, NextFunction } from "express";
 import reactionsService from "../../services/reactions";
 import userService from '../../services/users';
+import { ErrorCode, ErrorException } from "../../types/error.type";
+import { ReactionPayload } from "../../types/reaction.type";
 
 class ReactionController {
     public async allReactions(req: Request, res: Response, next: NextFunction) {
@@ -26,13 +28,23 @@ class ReactionController {
 
     public async createReaction(req: Request, res: Response, next: NextFunction) {
         try {
-            const reaction = req.body;
+            if (!req.headers.authorization) {
+                throw new ErrorException(ErrorCode.Unauthorized, 'Authorization header is missing.');
+            }
+
+            const authorization = req.headers.authorization;
+            const userId = await userService.core.getUserIdFromAuthorization(authorization);
+            const payload: ReactionPayload = {...req.body, userId};
             const postId: number = Number(req.params.post_id);
-            // make sure the user making the request is real
-            userService.core.validateUser(reaction.userId);
+
             // need to determine if the given user has already created a reaction on this same post of the same type
             // TODO: implement this
-            await reactionsService.core.createReaction(reaction, postId);
+            const existingReaction = await reactionsService.core.hasReacted(postId, userId, payload.reaction);
+            if (existingReaction) {
+                throw new ErrorException(ErrorCode.BadRequest, `User ${userId} has already reacted to post ${postId} with ${payload.reaction}`);
+            }
+
+            await reactionsService.core.createReaction(payload, postId);
             return res.sendStatus(201); // correctly created.
         }
         catch (error) {

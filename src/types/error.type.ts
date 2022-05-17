@@ -16,9 +16,9 @@ export class ErrorException extends Error {
     public meta: any;
     public status: number;
 
-    constructor(code: string = ErrorCode.Unknown, meta: any = {}) {
+    constructor(code: string = ErrorCode.Unknown, meta: string = "") {
         super(code);
-        this.meta = meta;
+        this.meta = {"Message": meta};
         this.status = 500;
         
         switch (code) {

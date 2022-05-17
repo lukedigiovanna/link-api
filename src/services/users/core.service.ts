@@ -15,6 +15,8 @@ class CoreUserService {
         this.auth = getAuth();
     }
 
+
+
     async getUsers(): Promise<User[]> {
         const users = await this.prisma.user.findMany({
             // all
@@ -33,7 +35,7 @@ class CoreUserService {
         });
 
         if (users) {
-            throw new ErrorException(ErrorCode.Conflict, {"message": `User ${user.name} already exists`});
+            throw new ErrorException(ErrorCode.Conflict, `User ${user.name} already exists`);
         }
 
         // first create a user in firebase
@@ -63,19 +65,30 @@ class CoreUserService {
         return newUser.id;
     }
 
-    async validateUser(userId: string): Promise<string> {
+    async doesUserExist(userId: string): Promise<string> {
         // get the user id of the username
         const user = await this.prisma.user.findFirst({
             where: {
                 id: userId
             }
         });
-        
+
         if (!user) { 
-            throw new ErrorException(ErrorCode.NotFound, {"message": `User ${userId} does not exist`});
+            throw new ErrorException(ErrorCode.NotFound, `User ${userId} does not exist`);
         }
         
         return user.id;
+    }
+
+    async getUserIdFromAuthorization(authorization: string): Promise<string> {
+        // remove Bearer from authorization string
+        const token = authorization.replace("Bearer ", "");
+        try {
+            const user = await this.auth.verifyIdToken(token);
+            return user.uid;
+        } catch (error) {
+            throw new ErrorException(ErrorCode.Unauthorized, "Invalid authorization");
+        }
     }
 
     async getUser(username: string): Promise<UserData> {
@@ -87,7 +100,7 @@ class CoreUserService {
         });
         
         if (!user) { 
-            throw new ErrorException(ErrorCode.NotFound, {"message": `User ${username} does not exist`});
+            throw new ErrorException(ErrorCode.NotFound, `User ${username} does not exist`);
         }
         
         const userId = user.id;
@@ -96,7 +109,7 @@ class CoreUserService {
         const infoData = info.data();
 
         if (!infoData) { // will not receive this data if there is no user associated with the ID
-            throw new ErrorException(ErrorCode.NotFound, {"message": `User ${userId} not found`});
+            throw new ErrorException(ErrorCode.NotFound, `User ${userId} not found`);
         }
         
         // convert firestore data to user data

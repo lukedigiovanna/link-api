@@ -79,6 +79,21 @@ class CoreReactionService {
         
         return reactionCounts;
     }
+
+    async hasReacted(postId: number, userId: string, reaction: Emotion): Promise<boolean> {
+        // see if there are any reactions that match the given 
+        const hasReacted = await this.prisma.reaction.findFirst({
+            where: {
+                post_id: postId,
+                user_id: userId,
+                reaction: reaction
+            }
+        });
+
+        console.log(hasReacted);
+
+        return hasReacted !== null;
+    }
 }
 
 export default new CoreReactionService();
