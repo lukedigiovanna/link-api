@@ -5,15 +5,16 @@ done POST /user - create a user
 done GET /user/:username - returns the information of a user given their username.
 
 posts:
-done GET /posts - return all posts
-POST /posts - create a post, if the post is marked as a reply it will be put in the replies table.
-halfdone DELETE /posts/:post_id - delete a particular post, does not delete replies of said post yet
-GET /posts/:username - get the posts of a user 
+done GET /posts?replyTo=postId&all=boolean - return all posts
+    query parameters: all, replyTo
+    all: indicates if should retrieve all posts at the postId and lower
+    replyTo: indicates the postId of the parent post of the replies
+done POST /posts - create a post, if the post is marked as a reply it will be put in the replies table.
+DELETE /posts/:post_id - delete a particular post, does not delete replies of said post yet
+done GET /posts/:username - get the posts of a user 
 
 reactions:
-GET /reactions - return all reactions
-GET /reactions/:post_id - return all reactions of a post
-POST /reactions/:post_id - create a reaction
-
-replies:
-GET /replies/:post_id - return all replies of a post/reply 
+done GET /reactions - return all reactions
+done GET /reactions/:post_id - return all reactions of a post
+done POST /reactions/:post_id - create a reaction
+done GET /reactions/count/:post_id - gets an object listing the counts of each reaction type for a post

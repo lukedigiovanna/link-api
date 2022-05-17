@@ -1,6 +1,7 @@
-import { PrismaClient, Reaction, Prisma } from "@prisma/client";
+import { PrismaClient, Reaction, Prisma, Emotion } from "@prisma/client";
+import { clearGlobalAppDefaultCred } from "firebase-admin/lib/app/credential-factory";
 import { ErrorException, ErrorCode } from '../../types/error.type';
-import { ReactionPayload } from "../../types/reaction.type";
+import { DefaultReactionCounts, ReactionCounts, ReactionPayload } from "../../types/reaction.type";
 
 class CoreReactionService {
     private prisma: PrismaClient;
@@ -17,20 +18,16 @@ class CoreReactionService {
         return reactions;
     }
 
-    async createReaction(reaction: ReactionPayload): Promise<number> {
-        console.log(reaction);
-        // const uncheckedInput: Prisma.ReactionUncheckedCreateInput = {
-        //     post_id: reaction.postId, 
-        //     user_id: reaction.userId,
-        //     reaction: reaction.reaction
-        // }
-        // const createdReaction = await this.prisma.reaction.create({
-        //     data: uncheckedInput
-        // });
+    async createReaction(reaction: ReactionPayload, postId: number): Promise<number> {
+        // check that the reaction is an actual emotion and not something random
+        if (!Object.values(Emotion).includes(reaction.reaction)) {
+            throw new ErrorException(ErrorCode.BadRequest, "Invalid reaction");
+        }
+
         const createdReaction = await this.prisma.reaction.create({
             data: {
                 Post: {
-                    connect: {id: reaction.postId}
+                    connect: {id: postId}
                 },
                 User: {
                     connect: {id: reaction.userId}
@@ -50,6 +47,40 @@ class CoreReactionService {
         });
 
         return reactions;
+    }
+
+    async getPostReactionCounts(postId: number): Promise<ReactionCounts> {
+        // count all reactions for each type
+        // const reactionCounts: ReactionCounts = DefaultReactionCounts();
+        
+        // Object.values(Emotion).forEach(async emotion => {
+        //     reactionCounts[emotion] = await this.prisma.reaction.count({
+        //         where: {
+        //             post_id: postId,
+        //             reaction: emotion
+        //         }          
+        //     });
+        //     console.log(emotion, reactionCounts)
+        // })
+
+        // count all reactions for each type
+        const reactionCounts: ReactionCounts = DefaultReactionCounts();
+        const reactions = await this.prisma.reaction.findMany({
+            where: {
+                post_id: postId // get them from the given post.
+            },
+            select: {
+                reaction: true // we only care about the reaction field
+            }
+        });
+        console.log(reactions);
+        Object.values(Emotion).forEach(reaction => {
+            reactionCounts[reaction] = reactions.filter(r => r.reaction === reaction).length;
+        });
+
+        console.log(reactionCounts);
+
+        return reactionCounts;
     }
 }
 

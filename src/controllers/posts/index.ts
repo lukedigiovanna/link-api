@@ -7,10 +7,18 @@ class PostController {
     public async allPosts(req: Request, res: Response, next: NextFunction) {
         try {
             const getAll = req.query.all === 'true';
-            const posts = await postService.core.getAllPosts(getAll);
-            return res.send(posts);
+            const parent = req.query.replyTo ? Number(req.query.replyTo) : 0;
+            if (parent > 0) {
+                const postIds = await postService.core.getReplyIdsTo(parent);
+                const posts = await postService.core.getPosts(postIds);
+                return res.send(posts);
+            }
+            else {
+                const posts = await postService.core.getAllPosts(getAll);
+                return res.send(posts);
+            }
         }
-        catch (error) {
+        catch (error) { 
             return next(error);
         }
     }

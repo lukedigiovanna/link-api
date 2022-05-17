@@ -9,6 +9,7 @@ class CorePostService {
         this.prisma = new PrismaClient();
     }
 
+    // get's either all posts or all posts and replies
     async getAllPosts(getAll: boolean): Promise<Post[]> {
         console.log(getAll);
         const posts = await this.prisma.post.findMany({
@@ -21,6 +22,32 @@ class CorePostService {
         });
 
         return posts;
+    }
+
+    async getPosts(postIds: number[]): Promise<Post[]> {
+        const posts = await this.prisma.post.findMany({
+            where: {
+                id: {
+                    in: postIds
+                }
+            }
+        });
+        return posts;
+    }
+
+    async getReplyIdsTo(postId: number): Promise<(number)[]> {
+        // find all replies to a post
+        const replies = await this.prisma.replies.findMany({
+            where: {
+                parent_id: postId
+            },
+            select: {
+                post_id: true,
+            }
+        });
+        const postIds = replies.map(reply => reply.post_id ? reply.post_id : 0);
+
+        return postIds;
     }
 
     async createPost(post: PostPayload): Promise<number> {
@@ -42,7 +69,10 @@ class CorePostService {
 
         const thisPostID = await this.createPost(post);
 
-        console.log(thisPostID);
+        // make sure we don't reply to itself
+        if (thisPostID == post.parentId) {
+            throw new ErrorException(ErrorCode.BadRequest, "parentId cannot be the same as the postId");
+        }
         
         const newReply = await this.prisma.replies.create({
             data: {

@@ -13,8 +13,9 @@ class ReactionsRouter implements RouteSource {
 
     public initializeRoutes() {
         this.router.get("/", this.controller.allReactions);
-        this.router.post("/", this.controller.createReaction);
+        this.router.post("/:post_id", this.controller.createReaction);
         this.router.get("/:post_id", this.controller.getPostReactions);
+        this.router.get("/count/:post_id", this.controller.getPostReactionsCount);
     }
 }
 
