@@ -11,7 +11,6 @@ class CorePostService {
 
     // get's either all posts or all posts and replies
     async getAllPosts(getAll: boolean): Promise<Post[]> {
-        console.log(getAll);
         const posts = await this.prisma.post.findMany({
             where: {
                 OR: [

@@ -1,5 +1,4 @@
 import { PrismaClient, Reaction, Prisma, Emotion } from "@prisma/client";
-import { clearGlobalAppDefaultCred } from "firebase-admin/lib/app/credential-factory";
 import { ErrorException, ErrorCode } from '../../types/error.type';
 import { DefaultReactionCounts, ReactionCounts, ReactionPayload } from "../../types/reaction.type";
 
@@ -12,7 +11,7 @@ class CoreReactionService {
 
     async getAllReactions(): Promise<Reaction[]> {
         const reactions = await this.prisma.reaction.findMany({
-            // all
+            // all 
         });
 
         return reactions;
@@ -73,13 +72,11 @@ class CoreReactionService {
                 reaction: true // we only care about the reaction field
             }
         });
-        console.log(reactions);
         Object.values(Emotion).forEach(reaction => {
             reactionCounts[reaction] = reactions.filter(r => r.reaction === reaction).length;
         });
 
-        console.log(reactionCounts);
-
+        
         return reactionCounts;
     }
 }

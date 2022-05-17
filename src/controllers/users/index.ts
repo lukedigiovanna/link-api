@@ -19,7 +19,6 @@ class UserController {
     public async createUser(req: Request, res: Response, next: NextFunction) {
         try {
             // handle request to create a new user
-            console.log(req.body);
             const userData: CreateUserPayload = req.body;
             // if using zod, we could ensure that the given userData follows the correct schema
             // CreateUserPayload.parse(userData); 

@@ -5,7 +5,6 @@ import userService from '../../services/users';
 class ReactionController {
     public async allReactions(req: Request, res: Response, next: NextFunction) {
         try {
-            console.log("Reactions");
             const reactions = await reactionsService.core.getAllReactions();
             return res.send(reactions);
         }

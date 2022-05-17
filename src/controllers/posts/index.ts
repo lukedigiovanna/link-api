@@ -30,8 +30,6 @@ class PostController {
             const userId = payload.userId;
             userService.core.validateUser(userId);
 
-            console.log(payload);
-
             if (payload.isReply) {
                 await postService.core.createReply(payload);
             }

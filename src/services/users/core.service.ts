@@ -98,9 +98,7 @@ class CoreUserService {
         if (!infoData) { // will not receive this data if there is no user associated with the ID
             throw new ErrorException(ErrorCode.NotFound, {"message": `User ${userId} not found`});
         }
-
-        console.log("Info Data", infoData);
-
+        
         // convert firestore data to user data
         if (infoData.createdAt) {
             infoData.createdAt = infoData.createdAt.toDate();
