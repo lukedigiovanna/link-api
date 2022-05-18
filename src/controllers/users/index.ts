@@ -9,6 +9,7 @@ class UserController {
         try {
             // handle request to get list of all users and their IDs
             const users = await usersService.core.getUsers();
+            
             return res.send(users);
         }
         catch (error) {
@@ -34,8 +35,10 @@ class UserController {
     public async getUser(req: Request, res: Response, next: NextFunction) {
         try {
             // handle request to get a user by ID
-            const username = req.params.username;
-            const user: UserData = await usersService.core.getUser(username);
+            const userId = req.params.userId;
+            // const byId = req.query.byId === 'true';
+            // const user: UserData = await (byId ? usersService.core.getUserById : usersService.core.getUserByUsername)(username);
+            const user: UserData = await usersService.core.getUserById(userId);
             return res.send(user);
         }
         catch (error) {

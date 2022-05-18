@@ -17,12 +17,21 @@ class CoreUserService {
 
 
 
-    async getUsers(): Promise<User[]> {
+    async getUsers(): Promise<UserData[]> {
         const users = await this.prisma.user.findMany({
             // all
         });
+        // now, thorugh each username, get the user info from firestore
+        const userPromises = users.map(async (user): Promise<UserData> => {
+            const userData = await this.getUserById(user.id);
+            return {
+                ...userData
+            };
+        });
 
-        return users;
+        const userData = await Promise.all(userPromises);
+
+        return userData;
     }
 
     async createUser(user: CreateUserPayload): Promise<string> {
@@ -91,8 +100,7 @@ class CoreUserService {
         }
     }
 
-    async getUser(username: string): Promise<UserData> {
-        // get the user id of the username
+    async getUserByUsername(username: string): Promise<UserData> {
         const user = await this.prisma.user.findFirst({
             where: {
                 username: username
@@ -102,8 +110,11 @@ class CoreUserService {
         if (!user) { 
             throw new ErrorException(ErrorCode.NotFound, `User ${username} does not exist`);
         }
-        
-        const userId = user.id;
+
+        return await this.getUserById(user.id);
+    }
+
+    async getUserById(userId: string): Promise<UserData> {
         const userDoc = this.firestore.collection("users").doc(userId);
         const info = await userDoc.get();
         const infoData = info.data();

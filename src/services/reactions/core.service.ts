@@ -25,10 +25,10 @@ class CoreReactionService {
 
         const createdReaction = await this.prisma.reaction.create({
             data: {
-                Post: {
+                posts: {
                     connect: {id: postId}
                 },
-                User: {
+                users: {
                     connect: {id: reaction.userId}
                 },
                 reaction: reaction.reaction
@@ -89,8 +89,6 @@ class CoreReactionService {
                 reaction: reaction
             }
         });
-
-        console.log(hasReacted);
 
         return hasReacted !== null;
     }

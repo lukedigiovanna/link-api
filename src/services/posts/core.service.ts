@@ -1,6 +1,8 @@
 import { PrismaClient, Post } from "@prisma/client";
 import { ErrorCode, ErrorException } from "../../types/error.type";
-import { PostPayload } from "../../types/post.type";
+import { PostData, PostPayload } from "../../types/post.type";
+import userService from "../users";
+import reactionService from '../reactions';
 
 class CorePostService {
     private prisma: PrismaClient;
@@ -9,21 +11,44 @@ class CorePostService {
         this.prisma = new PrismaClient();
     }
 
+    private async buildFullPost(post: Post): Promise<PostData> {
+        const user = await userService.core.getUserById(post.user_id ? post.user_id : "");
+        const reactions = await reactionService.core.getPostReactionCounts(post.id);
+        return {
+            id: post.id,
+            body: post.body ? post.body : "",
+            createdAt: post.created_at,
+            isReply: post.is_reply ? post.is_reply : false,
+            author: user,
+            reactionCounts: reactions 
+        }
+    }
+
+    private async buildFullPosts(posts: Post[]): Promise<PostData[]> {
+        const fullPosts = await Promise.all(posts.map(async post => {
+            return await this.buildFullPost(post);
+        }));
+        return fullPosts;
+    }
+
     // get's either all posts or all posts and replies
-    async getAllPosts(getAll: boolean): Promise<Post[]> {
+    async getAllPosts(getAll: boolean): Promise<PostData[]> {
         const posts = await this.prisma.post.findMany({
             where: {
                 OR: [
                     {is_reply: false}, // don't include replies, we only want original posts.
                     {is_reply: getAll} // include replies if getAll is true.
                 ]
+            },
+            orderBy: {
+                created_at: "desc"
             }
         });
 
-        return posts;
+        return await this.buildFullPosts(posts);
     }
 
-    async getPosts(postIds: number[]): Promise<Post[]> {
+    async getPosts(postIds: number[]): Promise<PostData[]> {
         const posts = await this.prisma.post.findMany({
             where: {
                 id: {
@@ -31,7 +56,8 @@ class CorePostService {
                 }
             }
         });
-        return posts;
+
+        return await this.buildFullPosts(posts);
     }
 
     async getReplyIdsTo(postId: number): Promise<(number)[]> {
@@ -93,17 +119,17 @@ class CorePostService {
         return post.id;
     }
 
-    async getUserPosts(username: string): Promise<Post[]> {
+    async getUserPosts(username: string): Promise<PostData[]> {
         const posts = await this.prisma.post.findMany({
             where: {
-                User: {
+                users: {
                     username: username
                 },
                 is_reply: false // don't include replies, we only want original posts.
             }
-        });
+        }); 
 
-        return posts;
+        return await this.buildFullPosts(posts);
     }
 }
 
