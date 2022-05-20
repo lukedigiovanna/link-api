@@ -1,16 +1,16 @@
 import { PrismaClient, Reaction, Prisma, Emotion } from "@prisma/client";
 import { ErrorException, ErrorCode } from '../../types/error.type';
 import { DefaultReactionCounts, ReactionCounts, ReactionPayload } from "../../types/reaction.type";
+import prisma from '../../config/prisma';
 
 class CoreReactionService {
-    private prisma: PrismaClient;
     
     constructor() {
-        this.prisma = new PrismaClient();
+
     }
 
     async getAllReactions(): Promise<Reaction[]> {
-        const reactions = await this.prisma.reaction.findMany({
+        const reactions = await prisma.reaction.findMany({
             // all 
         });
 
@@ -23,7 +23,7 @@ class CoreReactionService {
             throw new ErrorException(ErrorCode.BadRequest, "Invalid reaction");
         }
 
-        const createdReaction = await this.prisma.reaction.create({
+        const createdReaction = await prisma.reaction.create({
             data: {
                 posts: {
                     connect: {id: postId}
@@ -39,7 +39,7 @@ class CoreReactionService {
     }
 
     async getPostReactions(postId: number): Promise<Reaction[]> {
-        const reactions = await this.prisma.reaction.findMany({
+        const reactions = await prisma.reaction.findMany({
             where: {
                 post_id: postId
             }
@@ -53,7 +53,7 @@ class CoreReactionService {
         // const reactionCounts: ReactionCounts = DefaultReactionCounts();
         
         // Object.values(Emotion).forEach(async emotion => {
-        //     reactionCounts[emotion] = await this.prisma.reaction.count({
+        //     reactionCounts[emotion] = await prisma.reaction.count({
         //         where: {
         //             post_id: postId,
         //             reaction: emotion
@@ -64,7 +64,7 @@ class CoreReactionService {
 
         // count all reactions for each type
         const reactionCounts: ReactionCounts = DefaultReactionCounts();
-        const reactions = await this.prisma.reaction.findMany({
+        const reactions = await prisma.reaction.findMany({
             where: {
                 post_id: postId // get them from the given post.
             },
@@ -72,6 +72,7 @@ class CoreReactionService {
                 reaction: true // we only care about the reaction field
             }
         });
+
         Object.values(Emotion).forEach(reaction => {
             reactionCounts[reaction] = reactions.filter(r => r.reaction === reaction).length;
         });
@@ -82,7 +83,7 @@ class CoreReactionService {
 
     async hasReacted(postId: number, userId: string, reaction: Emotion): Promise<boolean> {
         // see if there are any reactions that match the given 
-        const hasReacted = await this.prisma.reaction.findFirst({
+        const hasReacted = await prisma.reaction.findFirst({
             where: {
                 post_id: postId,
                 user_id: userId,

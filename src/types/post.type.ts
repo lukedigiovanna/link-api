@@ -14,6 +14,7 @@ export interface PostData {
     body: string;
     createdAt: Date;
     isReply: boolean;
+    replyCount: number;
     author: UserData;
     reactionCounts: ReactionCounts;
 }
