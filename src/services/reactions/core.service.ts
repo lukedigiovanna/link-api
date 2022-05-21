@@ -17,7 +17,7 @@ class CoreReactionService {
         return reactions;
     }
 
-    async createReaction(reaction: ReactionPayload, postId: number): Promise<number> {
+    async createReaction(reaction: ReactionPayload, postId: number): Promise<Reaction> {
         // check that the reaction is an actual emotion and not something random
         if (!Object.values(Emotion).includes(reaction.reaction)) {
             throw new ErrorException(ErrorCode.BadRequest, "Invalid reaction");
@@ -35,7 +35,7 @@ class CoreReactionService {
             }
         });
 
-        return createdReaction.id;
+        return createdReaction;
     }
 
     async getPostReactions(postId: number): Promise<Reaction[]> {

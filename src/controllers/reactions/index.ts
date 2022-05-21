@@ -44,8 +44,8 @@ class ReactionController {
                 throw new ErrorException(ErrorCode.BadRequest, `User ${userId} has already reacted to post ${postId} with ${payload.reaction}`);
             }
 
-            await reactionsService.core.createReaction(payload, postId);
-            return res.sendStatus(201); // correctly created.
+            const reaction = await reactionsService.core.createReaction(payload, postId);
+            return res.send(reaction); // correctly created.
         }
         catch (error) {
             return next(error);
