@@ -35,20 +35,21 @@ class PostController {
                 throw new ErrorException(ErrorCode.Unauthorized, 'Authorization header is missing.');
             }
             const authorization = req.headers.authorization;
-            console.log(authorization);
             const userId = await userService.core.getUserIdFromAuthorization(authorization);
             // attach the authorized userId to the post payload.
             // this way only a request with proper authorization will translate into a post.
             const payload: PostPayload = {...req.body, userId}; 
 
+            let result;
+
             if (payload.isReply) {
-                await postService.core.createReply(payload);
+                result = await postService.core.createReply(payload);
             }
             else {
-                await postService.core.createPost(payload);
+                result = await postService.core.createPost(payload);
             }
 
-            return res.sendStatus(201);
+            return res.send(result);
         }
         catch (error) {
             return next(error);

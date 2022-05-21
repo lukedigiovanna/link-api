@@ -13,7 +13,7 @@ model Post {
   body                             String?
   created_at                       DateTime   @default(now()) @db.Timestamp(6)
   is_reply                         Boolean?
-  user                            User?      @relation("postsTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users                            User?      @relation("postsTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   reactions                        Reaction[] @relation("postsToreactions")
   replies_postsToreplies_parent_id Replies[]  @relation("postsToreplies_parent_id")
   replies_postsToreplies_post_id   Replies[]  @relation("postsToreplies_post_id")

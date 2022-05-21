@@ -134,7 +134,7 @@ class CorePostService {
         return postIds;
     }
 
-    async createPost(post: PostPayload): Promise<number> {
+    async createPost(post: PostPayload): Promise<PostData> {
         const newPost = await prisma.post.create({
             data: {
                 body: post.body,
@@ -143,29 +143,32 @@ class CorePostService {
             }
         });
 
-        return newPost.id;
+        // generate the post information
+        const postData = await this.getPosts([newPost.id]);
+
+        return postData[0];
     }
 
-    async createReply(post: PostPayload): Promise<number> {
+    async createReply(post: PostPayload): Promise<PostData> {
         if (!post.parentId) {
             throw new ErrorException(ErrorCode.BadRequest, "parentId is required for replies");
         }
 
-        const thisPostID = await this.createPost(post);
+        const thisPost = await this.createPost(post);
 
         // make sure we don't reply to itself
-        if (thisPostID == post.parentId) {
+        if (thisPost.id == post.parentId) {
             throw new ErrorException(ErrorCode.BadRequest, "parentId cannot be the same as the postId");
         }
         
         const newReply = await prisma.replies.create({
             data: {
-                post_id: thisPostID,
+                post_id: thisPost.id,
                 parent_id: post.parentId
             }
         });
 
-        return newReply.id;
+        return thisPost;
     }
 
     async deletePost(postId: number): Promise<number> {
