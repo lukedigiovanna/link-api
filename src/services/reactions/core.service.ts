@@ -17,6 +17,15 @@ class CoreReactionService {
         return reactions;
     }
 
+    async getAllUserReactions(userId: string): Promise<Reaction[]> {
+        const reactions = await prisma.reaction.findMany({
+            where: {
+                user_id: userId
+            }
+        });
+        return reactions;
+    }
+
     async createReaction(reaction: ReactionPayload, postId: number): Promise<Reaction> {
         // check that the reaction is an actual emotion and not something random
         if (!Object.values(Emotion).includes(reaction.reaction)) {
