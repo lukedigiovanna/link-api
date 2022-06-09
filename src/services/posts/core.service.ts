@@ -14,7 +14,7 @@ class CorePostService {
     }
 
     // get's either all posts or all posts and replies
-    async getAllPosts(getAll: boolean): Promise<PostData[]> {
+    async getAllPosts(getAll: boolean, offset: number, amount: number): Promise<PostData[]> {
         const posts = await prisma.post.findMany({
             where: {
                 OR: [
@@ -24,7 +24,9 @@ class CorePostService {
             },
             orderBy: {
                 created_at: "desc"
-            }
+            },
+            skip: offset,
+            take: amount
         });
 
         const postIds = posts.map(post => post.id);

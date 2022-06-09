@@ -8,14 +8,19 @@ class PostController {
     public async allPosts(req: Request, res: Response, next: NextFunction) {
         try {
             const getAll = req.query.all === 'true';
+            const offset = req.query.offset ? Number(req.query.offset) : 0;
+            const amount = req.query.amount ? Number(req.query.amount) : 10;
             const parent = req.query.replyTo ? Number(req.query.replyTo) : 0;
+
+            console.log(offset, amount);
+
             if (parent > 0) {
                 const postIds = await postService.core.getReplyIdsTo(parent);
                 const posts = await postService.core.getPosts(postIds);
                 return res.send(posts);
             }
             else {
-                const posts = await postService.core.getAllPosts(getAll);
+                const posts = await postService.core.getAllPosts(getAll, offset, amount);
                 return res.send(posts);
             }
         }

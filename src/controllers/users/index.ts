@@ -7,9 +7,7 @@ import { CreateUserPayload, UserData } from "../../types/user.type";
 class UserController {
     public async allUsers(req: Request, res: Response, next: NextFunction) {
         try {
-            // handle request to get list of all users and their IDs
             const users = await usersService.core.getUsers();
-            
             return res.send(users);
         }
         catch (error) {
@@ -36,8 +34,6 @@ class UserController {
         try {
             // handle request to get a user by ID
             const userId = req.params.userId;
-            // const byId = req.query.byId === 'true';
-            // const user: UserData = await (byId ? usersService.core.getUserById : usersService.core.getUserByUsername)(username);
             const user: UserData = await usersService.core.getUserById(userId);
             return res.send(user);
         }
